@@ -1,14 +1,15 @@
 clc; clear; close all;
 
 num_layers = 6;  
-sigma_res = 0.01;
+sigma_res = 0.1;
 sigma_phase = 0.01;
 NumFreq = 50;    
-frequency = logspace(-1, 2, NumFreq); 
+frequency = logspace(-3, 2, NumFreq); 
 
-res_true = [500, 1000, 100, 500, 1000, 200]; 
-thickness_true = [210, 1624, 1346, 1435, 1800];  
-
+% res_true = [500, 1000, 100, 500, 1000, 200]; 
+% thickness_true = [210, 1624, 1346, 1435, 1800];  
+res_true = [316, 35, 100, 10, 20]; 
+thickness_true = [800, 500, 8000, 700]; 
 [AppRes_obs, Phase_obs] = deal(zeros(NumFreq, 1));
 for j = 1:NumFreq
     [tmp1, tmp2, ~] = MTmodeling1D(res_true, thickness_true, frequency(j));
@@ -52,37 +53,77 @@ priorrnd = @(n) [...
     rand(n, 1) * (100) + 1400, ... % thickness_4
     rand(n, 1) * (100) + 1800];    % thickness_5
 
-
 loglikelihood_handle = @(theta) loglikelihood(theta, AppRes_obs, Phase_obs, frequency, sigma_res1, sigma_phase1, num_layers, NumFreq);
-
-fprintf('Running TMCMC...\n');
-tic;
-output_tmcmc = tmcmc_par('nsamples', 50000, ...
-                         'loglikelihood', loglikelihood_handle, ...
-                         'priorpdf', priorpdf, ...
-                         'priorrnd', priorrnd, ...
-                         'burnin', 10, ...
-                         'lastburnin', 50);
-time_tmcmc = toc;
-
-samples_tmcmc = output_tmcmc.samples;
-save('output_tmcmc5', 'output_tmcmc');
-save('time_tmcmc5', 'time_tmcmc');
+% 
+% fprintf('Running TMCMC...\n');
+% tic;
+% output_tmcmc = tmcmc_par('nsamples', 50000, ...
+%                          'loglikelihood', loglikelihood_handle, ...
+%                          'priorpdf', priorpdf, ...
+%                          'priorrnd', priorrnd, ...
+%                          'burnin', 10, ...
+%                          'lastburnin', 50);
+% time_tmcmc = toc;
+% 
+% samples_tmcmc = output_tmcmc.samples;
+% save('output_tmcmc50000', 'output_tmcmc');
+% save('time_tmcmc50000', 'time_tmcmc');
 
 fprintf('Running Langevin TMCMC...\n');
 tic;
-output_langevin = ltmcmc_par('nsamples', 5000, ...
+output_langevin1 = ltmcmc_par('nsamples', 5000, ...
                              'loglikelihood', loglikelihood_handle, ...
                              'priorpdf', priorpdf, ...
                              'priorrnd', priorrnd, ...
                              'burnin', 20, ...
-                             'epsilon', 0.5);
+                             'epsilon', 0.1);
 time_ltmcmc = toc;
 
-samples_langevin = output_langevin.samples;
-save('output_langevin5', 'output_langevin');
-save('time_ltmcmc5', 'time_ltmcmc');
-
+%samples_langevin3 = output_langevin1.samples;
+save('output_langevin5000', 'output_langevin1');
+save('time_ltmcmc5000', 'time_ltmcmc');
+% 
+% fprintf('Running Langevin TMCMC...\n');
+% tic;
+% output_langevin1 = ltmcmc_par('nsamples', 20000, ...
+%                              'loglikelihood', loglikelihood_handle, ...
+%                              'priorpdf', priorpdf, ...
+%                              'priorrnd', priorrnd, ...
+%                              'burnin', 20, ...
+%                              'epsilon', 0.3);
+% time_ltmcmc = toc;
+% 
+% %samples_langevin5 = output_langevin1.samples;
+% save('output_langevin2_3', 'output_langevin1');
+% save('time_ltmcmc2_3', 'time_ltmcmc');
+% 
+% fprintf('Running Langevin TMCMC...\n');
+% tic;
+% output_langevin1 = ltmcmc_par('nsamples', 20000, ...
+%                              'loglikelihood', loglikelihood_handle, ...
+%                              'priorpdf', priorpdf, ...
+%                              'priorrnd', priorrnd, ...
+%                              'burnin', 20, ...
+%                              'epsilon', 0.5);
+% time_ltmcmc = toc;
+% 
+% %samples_langevin8 = output_langevin1.samples;
+% save('output_langevin2_5', 'output_langevin1');
+% save('time_ltmcmc2_5', 'time_ltmcmc');
+% 
+% fprintf('Running Langevin TMCMC...\n');
+% tic;
+% output_langevin = ltmcmc_par('nsamples', 20000, ...
+%                              'loglikelihood', loglikelihood_handle, ...
+%                              'priorpdf', priorpdf, ...
+%                              'priorrnd', priorrnd, ...
+%                              'burnin', 20, ...
+%                              'epsilon', 0.8);
+% time_ltmcmc = toc;
+% 
+% %samples_langevin = output_langevin.samples;
+% save('output_langevin2_8', 'output_langevin');
+% save('time_ltmcmc2_8', 'time_ltmcmc');
 
 function loglike = loglikelihood(theta, AppRes_obs, Phase_obs, frequency, sigma_res1, sigma_phase1, num_layers, NumFreq)
     misfit_res = zeros(NumFreq, 1);

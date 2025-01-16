@@ -5,14 +5,17 @@ function [AppRes,Phase] = generateSynData
 % 12/14/2024: clean up the code for Xiaolong.
 %==========================================================================
 
-      res = [500,1000,100,500,1000];  % in ohm*meter
-thickness = [210,1624,1346,1435];  % in meters
-
+%       res = [500, 1000, 100, 500, 1000, 200];   % in ohm*meter
+% thickness = [210, 1624, 1346, 1435, 1800];    % in meters
+res = [316, 35, 100, 10, 20]; 
+thickness = [800, 500, 8000, 700];  
+% res = [100, 10,500]; 
+% thickness = [500, 1700];  
 %        res = [500,500,500,500,500];  % in ohm*meter
 % thickness = [210,1624,1346,1435];  % in meters
 
   NumFreq = 50;
-frequency = logspace(3,-3,NumFreq);
+frequency = logspace(-3,3,NumFreq);
 
 AppRes = zeros(NumFreq,1);
 Phase = zeros(NumFreq,1);
@@ -28,8 +31,8 @@ end
 % Add Gaussian noise
  % AppRes = log10(AppRes);
  % 
- % AppRes = AppRes + .01*randn(NumFreq,1);
- % Phase  = Phase  + .01*randn(NumFreq,1);
+  AppRes =AppRes + 0.1*randn(NumFreq,1);
+  Phase  = Phase+ 0.01*randn(NumFreq,1);
  
  %save -v7.3 AppRes.mat AppRes
  %save -v7.3 Phase.mat Phase
